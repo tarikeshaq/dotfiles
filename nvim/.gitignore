@@ -1,0 +1,10 @@
+# Claude Code settings
+.claude/
+
+# Lazy.nvim plugin directory
+lazy-lock.json
+
+# Neovim swap/backup files
+*.swp
+*.swo
+*~
