@@ -1,8 +1,20 @@
+# ====================================
+# Git Configuration
+# ====================================
+# This file contains shared settings across all machines.
+# For machine-specific overrides (like signingKey, custom email, etc.),
+# create ~/.gitconfig.local - it will be automatically included.
+
+[include]
+	# Include local machine-specific configuration
+	path = ~/.gitconfig.local
+
 [user]
 	email = tarikeshaq@gmail.com
 	name = Tarik Eshaq
-	# Set this to your SSH key path for commit signing
-	# signingKey = ~/.ssh/id_ed25519.pub
+	# Signing key should be set in ~/.gitconfig.local
+	# Example: signingKey = ~/.ssh/id_ed25519.pub
+
 [gpg]
 	format = ssh
 [core]

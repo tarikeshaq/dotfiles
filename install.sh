@@ -211,6 +211,31 @@ echo -e "${BLUE}=== Creating Symlinks ===${NC}\n"
 # Install .gitconfig
 create_symlink "$DOTFILES_DIR/.gitconfig" "$HOME/.gitconfig"
 
+# Create .gitconfig.local template if it doesn't exist
+if [ ! -f "$HOME/.gitconfig.local" ]; then
+    echo -e "${YELLOW}Creating ~/.gitconfig.local template...${NC}"
+    cat > "$HOME/.gitconfig.local" << 'EOF'
+# Local Git Configuration
+# This file is for machine-specific settings and is NOT tracked in the dotfiles repo.
+# Uncomment and configure settings as needed for this machine.
+
+[user]
+    # Uncomment to override email for this machine
+    # email = your.email@example.com
+
+    # Uncomment to override name for this machine
+    # name = Your Name
+
+    # Set your SSH signing key path
+    # signingKey = ~/.ssh/id_ed25519.pub
+
+# Add any other machine-specific git configuration below
+EOF
+    echo -e "${GREEN}✓ Created ~/.gitconfig.local template${NC}"
+else
+    echo -e "${GREEN}✓ ~/.gitconfig.local already exists${NC}"
+fi
+
 # Install .zshrc
 create_symlink "$DOTFILES_DIR/.zshrc" "$HOME/.zshrc"
 

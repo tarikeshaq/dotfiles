@@ -43,13 +43,35 @@ This will restore the most recent backups of your previous configs.
 
 ## Post-Installation
 
-After installation, set Zsh as your default shell:
+### 1. Set Zsh as Default Shell
 
 ```bash
 chsh -s $(which zsh)
 ```
 
 Then reload your shell or start a new terminal session.
+
+### 2. Configure Local Git Settings (Optional)
+
+The install script creates `~/.gitconfig.local` for machine-specific git configuration. Edit this file to set:
+
+```bash
+# Edit your local git config
+nvim ~/.gitconfig.local
+```
+
+Common settings to configure:
+- **signingKey**: Path to your SSH key for commit signing (e.g., `~/.ssh/id_ed25519.pub`)
+- **email**: Override email for this specific machine
+- **name**: Override name for this specific machine
+
+Example `~/.gitconfig.local`:
+```ini
+[user]
+    signingKey = ~/.ssh/id_ed25519.pub
+```
+
+This file is **not tracked** in the dotfiles repo, so your machine-specific settings stay private.
 
 ## Structure
 
