@@ -15,7 +15,7 @@ This repository contains my configuration files for:
 Clone this repo and run the install script:
 
 ```bash
-git clone https://github.com/yourusername/dotfiles.git ~/dotfiles
+git clone https://github.com/tarikeshaq/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 ./install.sh
 ```
@@ -63,12 +63,14 @@ dotfiles/
 └── README.md           # This file
 ```
 
-## Notes
+## Features
 
-- All paths use `$HOME` for portability
-- Platform-specific configurations are conditionally loaded
-- Backups are timestamped (e.g., `.zshrc.backup.20251022_143022`)
-- No secrets or API tokens are committed to this repo
+- **Automated Setup** - One script installs everything
+- **Smart Backups** - Existing configs are timestamped and preserved
+- **Cross-Platform** - Works on macOS and Linux
+- **Portable Paths** - All paths use `$HOME`, no hard-coded user directories
+- **Catppuccin Theme** - Consistent Macchiato theme across tmux and Neovim
+- **Vim-style Navigation** - Consistent keybindings for tmux and Neovim
 
 ## Zsh Plugins Included
 
@@ -76,6 +78,14 @@ dotfiles/
 - **poetry** - Python dependency management (Oh My Zsh built-in)
 - **zsh-autosuggestions** - Command suggestions based on history
 - **zsh-syntax-highlighting** - Syntax highlighting for commands
+
+## Contributing
+
+This is a personal dotfiles repository, but feel free to fork it and customize for your own use! If you find a bug or have a suggestion, issues and pull requests are welcome.
+
+## License
+
+MIT License - See [LICENSE](LICENSE) for details.
 
 ---
 
