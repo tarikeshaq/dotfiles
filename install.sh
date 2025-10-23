@@ -208,6 +208,9 @@ echo ""
 # ===== SYMLINK CREATION =====
 echo -e "${BLUE}=== Creating Symlinks ===${NC}\n"
 
+# Install .gitconfig
+create_symlink "$DOTFILES_DIR/.gitconfig" "$HOME/.gitconfig"
+
 # Install .zshrc
 create_symlink "$DOTFILES_DIR/.zshrc" "$HOME/.zshrc"
 

@@ -1,0 +1,43 @@
+[user]
+	email = tarikeshaq@gmail.com
+	name = Tarik Eshaq
+	# Set this to your SSH key path for commit signing
+	# signingKey = ~/.ssh/id_ed25519.pub
+[gpg]
+	format = ssh
+[core]
+	editor = nvim
+	pager = less -R
+[commit]
+	gpgsign = true
+[tag]
+	gpgsign = true
+[push]
+	gpgsign = if-asked
+[diff]
+	algorithm = histogram
+	tool = nvimdiff
+	submodule = log
+[color]
+	ui = auto
+	diff = auto
+	status = auto
+	branch = auto
+[difftool "nvimdiff"]
+	cmd = nvim -d \"$LOCAL\" \"$REMOTE\"
+[difftool]
+	prompt = false
+[merge]
+	tool = nvimdiff
+	conflictstyle = zdiff3
+[mergetool "nvimdiff"]
+	cmd = nvim -d \"$LOCAL\" \"$MERGED\" \"$REMOTE\" -c \"wincmd w\" -c \"wincmd J\"
+[mergetool]
+	prompt = false
+	keepBackup = false
+[rerere]
+	enabled = true
+[log]
+	decorate = auto
+[init]
+	defaultBranch = main
