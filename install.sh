@@ -53,6 +53,7 @@ if [ "$1" = "--restore" ] || [ "$1" = "-r" ]; then
     }
 
     # Restore configs
+    restore_backup "$HOME/.gitconfig"
     restore_backup "$HOME/.zshrc"
     restore_backup "$HOME/.tmux.conf"
     restore_backup "$HOME/.config/nvim"
