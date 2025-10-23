@@ -1,0 +1,17 @@
+# Local machine-specific git configuration
+# This file should NOT be committed as it contains personal settings
+.gitconfig.local
+
+# Editor/IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Backup files created by various tools
+*.backup.*
