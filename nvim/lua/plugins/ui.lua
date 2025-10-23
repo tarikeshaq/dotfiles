@@ -20,8 +20,9 @@ return {
             highlight_overrides = {
                 macchiato = function(colors)
                     return {
-                        -- Tone down comments to be less prominent
-                        Comment = { fg = colors.overlay0, style = { "italic" } },
+                        -- Tone down comments to be very subtle
+                        Comment = { fg = colors.surface2, style = {} },
+                        ["@comment"] = { fg = colors.surface2 },
                         -- Make keywords subtle
                         Keyword = { fg = colors.mauve },
                         -- Reduce emphasis on bash-specific elements
