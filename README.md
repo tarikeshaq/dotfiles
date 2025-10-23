@@ -6,6 +6,7 @@ My personal dotfiles for setting up a consistent development environment across 
 
 This repository contains my configuration files for:
 
+- **Git** - Git configuration with sensible defaults and local overrides
 - **Zsh** - Shell configuration with Oh My Zsh
 - **Neovim** - Text editor setup with Lua-based config
 - **tmux** - Terminal multiplexer configuration
@@ -77,6 +78,8 @@ This file is **not tracked** in the dotfiles repo, so your machine-specific sett
 
 ```
 dotfiles/
+├── .gitconfig          # Git configuration
+├── .gitignore          # Files to ignore in this repo
 ├── .zshrc              # Zsh configuration
 ├── .tmux.conf          # tmux configuration
 ├── nvim/               # Neovim configuration directory
@@ -84,6 +87,8 @@ dotfiles/
 ├── CLAUDE.md           # Documentation for AI assistants
 └── README.md           # This file
 ```
+
+**Note:** `~/.gitconfig.local` is created by the install script for machine-specific settings (like SSH signing keys) and is NOT tracked in this repo.
 
 ## Features
 

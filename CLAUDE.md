@@ -8,16 +8,35 @@ This repository contains personal dotfiles for a Unix-based development environm
 
 ```
 dotfiles/
+├── .gitconfig          # Git configuration with shared settings
+├── .gitignore          # Files to ignore in this repo
 ├── .zshrc              # Zsh shell configuration
 ├── .tmux.conf          # tmux terminal multiplexer configuration
 ├── nvim/               # Complete Neovim configuration (git repo, .git excluded)
 ├── install.sh          # Installation and restoration script
-└── CLAUDE.md           # This file - documentation for AI assistants
+├── CLAUDE.md           # This file - documentation for AI assistants
+└── README.md           # User-facing documentation
 ```
+
+**Important:** `~/.gitconfig.local` is created by install.sh but NOT tracked in the repo (for machine-specific settings).
 
 ## Key Components
 
-### 1. .zshrc (Shell Configuration)
+### 1. .gitconfig (Git Configuration)
+- **Location**: `~/.gitconfig` (symlinked from repo)
+- **Local Override**: `~/.gitconfig.local` (created by install.sh, not tracked)
+- **Features**:
+  - User identity (Tarik Eshaq / tarikeshaq@gmail.com)
+  - SSH-based commit signing (key configured in local file)
+  - nvim as default editor and diff/merge tool
+  - Histogram diff algorithm
+  - zdiff3 conflict style for clearer merge conflicts
+  - rerere enabled (reuse recorded resolution)
+  - Default branch set to main
+- **Pattern**: Uses `[include]` directive to load `~/.gitconfig.local` for machine-specific overrides
+- **Important**: Signing key (user.signingKey) should be set in `~/.gitconfig.local`, not in the repo
+
+### 2. .zshrc (Shell Configuration)
 - **Location**: `~/.zshrc` (symlinked from repo)
 - **Framework**: Uses Oh My Zsh
 - **Plugins**:
@@ -79,24 +98,34 @@ dotfiles/
 - Always use `$HOME` or `~` for user paths
 - This ensures portability across different machines and users
 
-### 2. Platform-Specific Code
+### 2. Git Configuration Pattern
+- **Shared settings** in `.gitconfig` (tracked in repo)
+- **Machine-specific settings** in `~/.gitconfig.local` (not tracked)
+- Uses `[include] path = ~/.gitconfig.local` to load local overrides
+- install.sh automatically creates `~/.gitconfig.local` template if missing
+- Settings like `user.signingKey` belong in local config, not repo
+- Pattern allows users to override any setting per-machine without touching repo files
+
+### 3. Platform-Specific Code
 - macOS-specific paths/settings wrapped in: `if [[ "$OSTYPE" == "darwin"* ]]; then`
 - Examples:
   - Homebrew paths (`/opt/homebrew`, `/usr/local`)
   - macOS-specific apps (`/Applications/CMake.app`)
   - Directory existence checks before adding to PATH
 
-### 3. Security
+### 4. Security
 - No API tokens, secrets, or credentials in config files
 - Use environment variables or separate untracked files for secrets
+- Machine-specific secrets (like signing keys) go in `~/.gitconfig.local`, not the repo
 
-### 4. Backup Philosophy
+### 5. Backup Philosophy
 - Always backup before overwriting
 - Use timestamps for backup filenames
 - Keep multiple backups (don't auto-delete old ones)
 - Restore always uses most recent backup
+- Restore includes: `.gitconfig`, `.zshrc`, `.tmux.conf`, and `nvim/`
 
-### 5. Plugin Installation
+### 6. Plugin Installation
 - `zsh-autosuggestions`: Installed via git clone to Oh My Zsh custom plugins directory
 - `zsh-syntax-highlighting`: Installed via git clone to `~/zsh-syntax-highlighting/`
 - Both checked for existence before installation
