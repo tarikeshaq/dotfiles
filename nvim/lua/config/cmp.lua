@@ -22,7 +22,11 @@ cmp.setup({
            else
             fallback()
            end
-        end, {'i', 's'})
+        end, {'i', 's'}),
+        ['<C-l>'] = cmp.mapping(function()
+            vim.cmd('normal! e')
+            vim.cmd('startinsert!')
+        end, {'i'}),
     }),
 
     sources = cmp.config.sources({

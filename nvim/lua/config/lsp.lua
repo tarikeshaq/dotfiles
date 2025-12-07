@@ -81,6 +81,7 @@ vim.lsp.config('gopls', {
 
 vim.lsp.enable('gopls')
 
+vim.lsp.enable('clangd')
 
 -- Keymaps for lsp
 local map = vim.keymap.set

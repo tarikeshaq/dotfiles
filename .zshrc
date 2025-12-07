@@ -173,8 +173,9 @@ complete -o nospace -C /usr/bin/terraform terraform
 
 export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 export PATH="$PATH:$HOME/bin"
-
-
+export PATH="${PATH}:/usr/local/cuda-13.0/bin"
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda-13.0/lib64
+export PATH="$PATH:$HOME/clangd_21.1.0/bin"
 
 # BEGIN opam configuration
 # This is useful if you're using opam as it adds:

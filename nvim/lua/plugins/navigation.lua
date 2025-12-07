@@ -18,6 +18,11 @@ return {
                 },
                 sync_root_with_cwd = true,
                 respect_buf_cwd = true,
+                git = {
+                    enable = true,
+                    ignore = false,
+                    timeout = 500,
+                },
             }
         end,
     },
