@@ -103,6 +103,23 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+# Enable vim mode
+bindkey -v
+
+# Reduce ESC key delay (default is 0.4s)
+export KEYTIMEOUT=1
+
+# Show vim mode in prompt with cursor shape
+# Block cursor for normal mode, beam cursor for insert mode
+function zle-keymap-select {
+  if [[ ${KEYMAP} == vicmd ]] || [[ $1 = 'block' ]]; then
+    echo -ne '\e[1 q'  # Block cursor for normal mode
+  else
+    echo -ne '\e[5 q'  # Beam cursor for insert mode
+  fi
+}
+zle -N zle-keymap-select
+echo -ne '\e[5 q'  # Start with beam cursor
 
 # Homebrew installs OpenSSL to `/usr/local/opt/openssl` instead of
 # `/usr/local`. (macOS only)
@@ -169,12 +186,17 @@ if [ -f "$HOME/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]; then
 fi
 
 autoload -U +X bashcompinit && bashcompinit
-complete -o nospace -C /usr/bin/terraform terraform
+if command -v terraform &> /dev/null; then
+  complete -o nospace -C $(command -v terraform) terraform
+fi
 
 export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 export PATH="$PATH:$HOME/bin"
-export PATH="${PATH}:/usr/local/cuda-13.0/bin"
-export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda-13.0/lib64
+# CUDA setup - only add if CUDA is installed
+if [ -d "/usr/local/cuda-13.0" ]; then
+  export PATH="${PATH}:/usr/local/cuda-13.0/bin"
+  export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda-13.0/lib64
+fi
 export PATH="$PATH:$HOME/clangd_21.1.0/bin"
 
 # BEGIN opam configuration
@@ -188,10 +210,10 @@ export PATH="$PATH:$HOME/clangd_21.1.0/bin"
 export PATH="$PATH:$HOME/.local/share/coursier/bin"
 # <<< coursier install directory <<<
 
-# JJ completion
-autoload -U compinit
-compinit
-source <(jj util completion zsh)
+# JJ completion - only load if jj is installed
+if command -v jj &> /dev/null; then
+  source <(jj util completion zsh)
+fi
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
