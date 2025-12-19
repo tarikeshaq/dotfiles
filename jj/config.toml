@@ -1,0 +1,9 @@
+#:schema https://docs.jj-vcs.dev/latest/config-schema.json
+
+[user]
+name = "Tarik Eshaq"
+email = "tarikeshaq@gmail.com"
+
+
+[ui]
+editor = "nvim"

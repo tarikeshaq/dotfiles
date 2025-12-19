@@ -32,8 +32,12 @@ if [ "$1" = "--restore" ] || [ "$1" = "-r" ]; then
         # Find the most recent backup file
         local backup=$(find "$target_dir" -maxdepth 1 -name "${target_name}.backup.*" -type f 2>/dev/null | sort -r | head -n 1)
 
-        # For nvim, also check for directory backups
+        # For nvim and jj, also check for directory backups
         if [ -z "$backup" ] && [ "$target_name" = "nvim" ]; then
+            backup=$(find "$target_dir" -maxdepth 1 -name "${target_name}.backup.*" -type d 2>/dev/null | sort -r | head -n 1)
+        fi
+
+        if [ -z "$backup" ] && [ "$target_name" = "jj" ]; then
             backup=$(find "$target_dir" -maxdepth 1 -name "${target_name}.backup.*" -type d 2>/dev/null | sort -r | head -n 1)
         fi
 
@@ -57,6 +61,7 @@ if [ "$1" = "--restore" ] || [ "$1" = "-r" ]; then
     restore_backup "$HOME/.zshrc"
     restore_backup "$HOME/.tmux.conf"
     restore_backup "$HOME/.config/nvim"
+    restore_backup "$HOME/.config/jj"
 
     echo ""
     echo -e "${GREEN}✓ Restore complete!${NC}"
@@ -245,6 +250,9 @@ create_symlink "$DOTFILES_DIR/.tmux.conf" "$HOME/.tmux.conf"
 
 # Install nvim config
 create_symlink "$DOTFILES_DIR/nvim" "$HOME/.config/nvim"
+
+# Install jj config
+create_symlink "$DOTFILES_DIR/jj" "$HOME/.config/jj"
 
 echo ""
 echo -e "${GREEN}✓ Dotfiles installation complete!${NC}"
