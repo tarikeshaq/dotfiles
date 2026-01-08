@@ -13,6 +13,9 @@ vim.opt.writebackup = false
 vim.opt.backup = false
 vim.opt.swapfile = false
 
+-- Remove the laststatus
+vim.opt.laststatus = 0
+
 -- Auto-reload files changed outside of Neovim
 vim.opt.autoread = true     -- Automatically read files when changed outside of Neovim
 
