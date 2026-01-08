@@ -8,6 +8,7 @@ return {
         priority = 1000,
         opts = {
             flavour = "macchiato",
+            transparent_background = true,
             styles = {
                 comments = { "italic" },
                 conditionals = {},
