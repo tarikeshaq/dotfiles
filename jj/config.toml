@@ -20,9 +20,22 @@ sign-on-push = true
 [revset-aliases]
 # All bookmark commits that are descendants of the given revision
 "st(x)" = "descendants(x) & bookmarks()"
+# Nearest bookmark in the ancestry path to a given revision
+"closest_bookmark(to)" = "heads(::to & bookmarks())"
 
 [aliases]
 # Log the stack: all bookmarks descending from the parent of @
 ls = ["log", "-r", "st(@-)"]
 # Push the stack: push all bookmarks descending from the parent of @
 ps = ["git", "push", "-r", "st(@-)"]
+# Move the nearest bookmark forward to @-
+tug = ["bookmark", "move", "--from", "closest_bookmark(@-)", "--to", "@-"]
+# Create a new bookmark at @-
+nb = ["bookmark", "create", "-r", "@-"]
+# Push, allowing new bookmarks without an extra flag
+push = ["git", "push", "--allow-new"]
+# Shorthands
+c = ["commit"]
+r = ["rebase"]
+s = ["squash"]
+e = ["edit"]
