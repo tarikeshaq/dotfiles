@@ -16,3 +16,13 @@ key = "~/.ssh/id_ed25519.pub"
 
 [git]
 sign-on-push = true
+
+[revset-aliases]
+# All bookmark commits that are descendants of the given revision
+"st(x)" = "descendants(x) & bookmarks()"
+
+[aliases]
+# Log the stack: all bookmarks descending from the parent of @
+ls = ["log", "-r", "st(@-)"]
+# Push the stack: push all bookmarks descending from the parent of @
+ps = ["git", "push", "-r", "st(@-)"]
