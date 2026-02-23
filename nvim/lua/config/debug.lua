@@ -26,10 +26,20 @@ local map = vim.keymap.set
 
 map('n', '<leader>dc',  function() dap.continue() end,                        { desc = 'Debug: Continue/Start' })
 map('n', '<leader>dl',  function() dap.run_last() end,                         { desc = 'Debug: Run last' })
-map('n', '<leader>dt',  function() dap.toggle_breakpoint() end,                { desc = 'Debug: Toggle breakpoint' })
+map('n', '<leader>db',  function() dap.toggle_breakpoint() end,                { desc = 'Debug: Toggle breakpoint' })
 map('n', '<leader>dB',  function()
     dap.set_breakpoint(vim.fn.input('Breakpoint condition: '))
 end,                                                                            { desc = 'Debug: Conditional breakpoint' })
+map('n', '<leader>dt',  function()
+    local ft = vim.bo.filetype
+    if ft == 'go' then
+        require('dap-go').debug_test()
+    elseif ft == 'rust' then
+        vim.cmd.RustLsp('debuggables')
+    else
+        dap.continue()
+    end
+end,                                                                            { desc = 'Debug: Test under cursor' })
 map('n', '<leader>dso', function() dap.step_over() end,                        { desc = 'Debug: Step over' })
 map('n', '<leader>dsi', function() dap.step_into() end,                        { desc = 'Debug: Step into' })
 map('n', '<leader>dse', function() dap.step_out() end,                         { desc = 'Debug: Step out' })
