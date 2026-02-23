@@ -8,4 +8,5 @@ require("config.cmp")
 require("config.colorscheme")
 require("config.lsp")
 require("config.git")
+require("config.debug")
 
