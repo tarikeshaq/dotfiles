@@ -33,7 +33,7 @@ tug = ["bookmark", "move", "--from", "closest_bookmark(@-)", "--to", "@-"]
 # Create a new bookmark at @-
 nb = ["bookmark", "create", "-r", "@-"]
 # Push, allowing new bookmarks without an extra flag
-push = ["git", "push", "--allow-new"]
+push = ["git", "push"]
 # Shorthands
 c = ["commit"]
 r = ["rebase"]
