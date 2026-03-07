@@ -32,7 +32,7 @@ jj is fundamentally different from git. Internalize these concepts:
 | `jj describe -m "msg"` | Set/change current commit's message |
 | `jj edit REVISION` | Switch to editing an existing commit |
 | `jj rebase -d DEST` | Move current commit (and descendants) onto DEST |
-| `jj squash` | Fold current commit's changes into its parent |
+| `jj squash -m "msg"` | Fold current commit's changes into its parent (always pass `-m`) |
 | `jj split [PATHS]` | Split current commit into two (use path args, never `-i`) |
 | `jj bookmark create NAME -r REV` | Create a bookmark at a revision |
 | `jj bookmark set NAME -r REV` | Move an existing bookmark to a revision |
@@ -125,4 +125,5 @@ jj ps
 - **Never delete the `.jj/` directory.**
 - **Never force-push** without explicit user confirmation.
 - **Never use interactive flags** (`-i`, `--interactive`, `--tool=:builtin`) — these require terminal interaction which LLMs cannot provide. Use non-interactive alternatives: `jj split` with file path arguments, `jj describe -m` instead of opening an editor.
+- **Always use `jj squash -m "message"`** — plain `jj squash` opens an interactive editor when both the source and destination commits have messages. Always pass `-m` to provide the combined message directly.
 - **Avoid creating temporary files in the repo** — jj auto-tracks all files. Use `/tmp` or another directory outside the repo for scratch files.
