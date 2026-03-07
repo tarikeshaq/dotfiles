@@ -41,6 +41,10 @@ if [ "$1" = "--restore" ] || [ "$1" = "-r" ]; then
             backup=$(find "$target_dir" -maxdepth 1 -name "${target_name}.backup.*" -type d 2>/dev/null | sort -r | head -n 1)
         fi
 
+        if [ -z "$backup" ] && [ "$target_name" = "skills" ]; then
+            backup=$(find "$target_dir" -maxdepth 1 -name "${target_name}.backup.*" -type d 2>/dev/null | sort -r | head -n 1)
+        fi
+
         if [ -n "$backup" ]; then
             # Remove current symlink/file
             if [ -L "$target" ] || [ -e "$target" ]; then
@@ -62,6 +66,8 @@ if [ "$1" = "--restore" ] || [ "$1" = "-r" ]; then
     restore_backup "$HOME/.tmux.conf"
     restore_backup "$HOME/.config/nvim"
     restore_backup "$HOME/.config/jj"
+    restore_backup "$HOME/.claude/skills"
+    restore_backup "$HOME/.cursor/skills"
 
     echo ""
     echo -e "${GREEN}✓ Restore complete!${NC}"
@@ -253,6 +259,19 @@ create_symlink "$DOTFILES_DIR/nvim" "$HOME/.config/nvim"
 
 # Install jj config
 create_symlink "$DOTFILES_DIR/jj" "$HOME/.config/jj"
+
+# Install LLM skills (only if tool directories exist)
+if [ -d "$HOME/.claude" ]; then
+    create_symlink "$DOTFILES_DIR/skills" "$HOME/.claude/skills"
+else
+    echo -e "${YELLOW}Skipping Claude Code skills (~/.claude not found)${NC}"
+fi
+
+if [ -d "$HOME/.cursor" ]; then
+    create_symlink "$DOTFILES_DIR/skills" "$HOME/.cursor/skills"
+else
+    echo -e "${YELLOW}Skipping Cursor skills (~/.cursor not found)${NC}"
+fi
 
 echo ""
 echo -e "${GREEN}✓ Dotfiles installation complete!${NC}"
