@@ -10,6 +10,7 @@ This repository contains my configuration files for:
 - **Zsh** - Shell configuration with Oh My Zsh
 - **Neovim** - Text editor setup with Lua-based config
 - **tmux** - Terminal multiplexer configuration
+- **LLM Skills** - Reusable [Agent Skills](https://agentskills.io) for Claude Code and Cursor
 
 ## Installation
 
@@ -83,6 +84,7 @@ dotfiles/
 ├── .zshrc              # Zsh configuration
 ├── .tmux.conf          # tmux configuration
 ├── nvim/               # Neovim configuration directory
+├── skills/             # LLM skills (Claude Code & Cursor)
 ├── install.sh          # Installation and restore script
 ├── CLAUDE.md           # Documentation for AI assistants
 └── README.md           # This file
@@ -98,6 +100,18 @@ dotfiles/
 - **Portable Paths** - All paths use `$HOME`, no hard-coded user directories
 - **Catppuccin Theme** - Consistent Macchiato theme across tmux and Neovim
 - **Vim-style Navigation** - Consistent keybindings for tmux and Neovim
+
+## LLM Skills
+
+The `skills/` directory contains reusable skills in the [Agent Skills](https://agentskills.io) open standard format, shared by both Claude Code and Cursor. The install script symlinks this directory to `~/.claude/skills` and/or `~/.cursor/skills` (only if the respective tool directory exists).
+
+To add a new skill, create a subdirectory under `skills/` with a `SKILL.md` file:
+
+```
+skills/
+└── my-skill/
+    └── SKILL.md
+```
 
 ## Zsh Plugins Included
 

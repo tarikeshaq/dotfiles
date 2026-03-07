@@ -13,6 +13,7 @@ dotfiles/
 ├── .zshrc              # Zsh shell configuration
 ├── .tmux.conf          # tmux terminal multiplexer configuration
 ├── nvim/               # Complete Neovim configuration (git repo, .git excluded)
+├── skills/             # Reusable LLM skills (shared by Claude Code and Cursor)
 ├── install.sh          # Installation and restoration script
 ├── CLAUDE.md           # This file - documentation for AI assistants
 └── README.md           # User-facing documentation
@@ -64,7 +65,15 @@ dotfiles/
   - `lazy-lock.json` - Plugin version lock file
 - **Note**: The `.git` directory is excluded when copying to this repo since nvim config is its own git repository
 
-### 4. install.sh (Installation Script)
+### 4. skills/ (LLM Skills)
+- **Format**: [Agent Skills](https://agentskills.io) open standard — YAML frontmatter (`name`, `description`) + markdown body
+- **Symlinked to**:
+  - `~/.claude/skills` (if `~/.claude` exists — Claude Code)
+  - `~/.cursor/skills` (if `~/.cursor` exists — Cursor)
+- **Structure**: Each skill is a subdirectory containing `SKILL.md`, with optional `references/`, `examples/`, and `scripts/` subdirectories
+- **Note**: Both tools share the same format, so a single `skills/` source directory serves both
+
+### 5. install.sh (Installation Script)
 - **Purpose**: Automates setup on new machines
 - **Executable**: Yes (chmod +x)
 
@@ -123,7 +132,7 @@ dotfiles/
 - Use timestamps for backup filenames
 - Keep multiple backups (don't auto-delete old ones)
 - Restore always uses most recent backup
-- Restore includes: `.gitconfig`, `.zshrc`, `.tmux.conf`, and `nvim/`
+- Restore includes: `.gitconfig`, `.zshrc`, `.tmux.conf`, `nvim/`, `jj/`, and `skills/`
 
 ### 6. Plugin Installation
 - `zsh-autosuggestions`: Installed via git clone to Oh My Zsh custom plugins directory
