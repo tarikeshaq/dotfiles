@@ -8,6 +8,7 @@ This repository contains my configuration files for:
 
 - **Git** - Git configuration with sensible defaults and local overrides
 - **Zsh** - Shell configuration with Oh My Zsh
+- **jj**: - Jujitsu (the version control) Aliases and configuration
 - **Neovim** - Text editor setup with Lua-based config
 - **tmux** - Terminal multiplexer configuration
 - **LLM Skills** - Reusable [Agent Skills](https://agentskills.io) for Claude Code and Cursor
