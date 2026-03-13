@@ -1,0 +1,101 @@
+#!/bin/bash
+set -e
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+usage() {
+    echo "Usage: start-dev <feature-name>"
+    echo ""
+    echo "Creates a jj workspace at ~/code/workspaces/<feature-name>"
+    echo "and opens a tmux window with two vertical panes at it."
+    exit 1
+}
+
+if [ $# -ne 1 ]; then
+    usage
+fi
+
+FEATURE_NAME="$1"
+WORKSPACE_DIR="$HOME/code/workspaces/$FEATURE_NAME"
+
+# --- Check that we're in a jj repository ---
+if ! jj root > /dev/null 2>&1; then
+    echo -e "${RED}Error: Not in a jj repository${NC}"
+    exit 1
+fi
+
+# --- Detect default branch (main@origin vs master@origin) ---
+has_main=false
+has_master=false
+
+if jj log -r 'main@origin' --no-graph --limit 1 > /dev/null 2>&1; then
+    has_main=true
+fi
+if jj log -r 'master@origin' --no-graph --limit 1 > /dev/null 2>&1; then
+    has_master=true
+fi
+
+if $has_main && $has_master; then
+    main_ts=$(jj log -r 'main@origin' -T 'committer.timestamp()' --no-graph --limit 1 2>/dev/null)
+    master_ts=$(jj log -r 'master@origin' -T 'committer.timestamp()' --no-graph --limit 1 2>/dev/null)
+    if [[ "$main_ts" > "$master_ts" ]]; then
+        BASE_REV="main@origin"
+    else
+        BASE_REV="master@origin"
+    fi
+elif $has_main; then
+    BASE_REV="main@origin"
+elif $has_master; then
+    BASE_REV="master@origin"
+else
+    echo -e "${RED}Error: Neither main@origin nor master@origin found${NC}"
+    exit 1
+fi
+
+echo -e "${GREEN}Using base revision: ${BASE_REV}${NC}"
+
+# --- Create workspace ---
+mkdir -p "$HOME/code/workspaces"
+
+echo -e "${YELLOW}Creating jj workspace at ${WORKSPACE_DIR}...${NC}"
+if ! jj workspace add "$WORKSPACE_DIR" --name "$FEATURE_NAME" -r "$BASE_REV"; then
+    echo -e "${RED}Error: Failed to create jj workspace${NC}"
+    exit 1
+fi
+echo -e "${GREEN}Workspace created successfully${NC}"
+
+# --- tmux window creation ---
+if [ -n "$TMUX" ]; then
+    tmux new-window -n "$FEATURE_NAME" -c "$WORKSPACE_DIR"
+    tmux split-window -h -c "$WORKSPACE_DIR"
+    tmux select-pane -t 1
+else
+    SESSION=""
+
+    if tmux list-sessions > /dev/null 2>&1; then
+        SESSION=$(tmux list-sessions -F '#{session_name}:#{?session_attached,attached,detached}' \
+            | grep ':attached$' | head -n 1 | cut -d: -f1)
+
+        if [ -z "$SESSION" ]; then
+            SESSION=$(tmux list-sessions -F '#{session_name}' | head -n 1)
+        fi
+    fi
+
+    if [ -n "$SESSION" ]; then
+        tmux new-window -t "$SESSION" -n "$FEATURE_NAME" -c "$WORKSPACE_DIR"
+        tmux split-window -h -t "$SESSION:$FEATURE_NAME" -c "$WORKSPACE_DIR"
+        tmux select-pane -t "$SESSION:$FEATURE_NAME.1"
+        tmux attach-session -t "$SESSION"
+    else
+        SESSION=$(basename "$PWD")
+        tmux new-session -d -s "$SESSION" -n "$FEATURE_NAME" -c "$WORKSPACE_DIR"
+        tmux split-window -h -t "$SESSION:$FEATURE_NAME" -c "$WORKSPACE_DIR"
+        tmux select-pane -t "$SESSION:$FEATURE_NAME.1"
+        tmux attach-session -t "$SESSION"
+    fi
+fi
+
+echo -e "${GREEN}Done! tmux window '${FEATURE_NAME}' is ready.${NC}"

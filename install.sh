@@ -273,6 +273,16 @@ else
     echo -e "${YELLOW}Skipping Cursor skills (~/.cursor not found)${NC}"
 fi
 
+# Install scripts from bin/ to ~/bin/
+if [ -d "$DOTFILES_DIR/bin" ]; then
+    echo -e "\n${BLUE}=== Installing Scripts ===${NC}\n"
+    mkdir -p "$HOME/bin"
+    for script in "$DOTFILES_DIR/bin"/*; do
+        [ -f "$script" ] || continue
+        create_symlink "$script" "$HOME/bin/$(basename "$script")"
+    done
+fi
+
 echo ""
 echo -e "${GREEN}✓ Dotfiles installation complete!${NC}"
 echo -e "${YELLOW}Note: You may need to restart your shell or run 'chsh -s \$(which zsh)' to set Zsh as default shell${NC}"

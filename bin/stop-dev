@@ -1,0 +1,88 @@
+#!/bin/bash
+set -e
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+WORKSPACES_ROOT="$HOME/code/workspaces"
+
+usage() {
+    echo "Usage: stop-dev [feature-name]"
+    echo ""
+    echo "Forgets the jj workspace, deletes its directory at"
+    echo "~/code/workspaces/<feature-name>, and kills any tmux"
+    echo "windows named <feature-name>."
+    echo ""
+    echo "If no feature-name is given and the current directory is"
+    echo "inside ~/code/workspaces/<name>, that workspace is used."
+    exit 1
+}
+
+if [ $# -gt 1 ]; then
+    usage
+fi
+
+if [ $# -eq 1 ]; then
+    FEATURE_NAME="$1"
+else
+    case "$PWD" in
+        "$WORKSPACES_ROOT"/*)
+            relative="${PWD#$WORKSPACES_ROOT/}"
+            FEATURE_NAME="${relative%%/*}"
+            ;;
+        *)
+            echo -e "${RED}Error: Not inside ${WORKSPACES_ROOT}/ and no feature name provided${NC}"
+            usage
+            ;;
+    esac
+    echo -e "${YELLOW}Detected workspace: ${FEATURE_NAME}${NC}"
+    cd "$WORKSPACES_ROOT/$FEATURE_NAME"
+fi
+
+WORKSPACE_DIR="$WORKSPACES_ROOT/$FEATURE_NAME"
+
+# --- Check that we're in a jj repository ---
+if ! jj root > /dev/null 2>&1; then
+    echo -e "${RED}Error: Not in a jj repository${NC}"
+    exit 1
+fi
+
+# --- Forget the jj workspace ---
+echo -e "${YELLOW}Forgetting jj workspace '${FEATURE_NAME}'...${NC}"
+if ! jj workspace forget "$FEATURE_NAME"; then
+    echo -e "${RED}Error: Failed to forget workspace '${FEATURE_NAME}'${NC}"
+    exit 1
+fi
+echo -e "${GREEN}Workspace forgotten${NC}"
+
+# --- Delete the workspace directory ---
+if [ -d "$WORKSPACE_DIR" ]; then
+    echo -e "${YELLOW}Removing ${WORKSPACE_DIR}...${NC}"
+    rm -rf "$WORKSPACE_DIR"
+    echo -e "${GREEN}Directory removed${NC}"
+else
+    echo -e "${YELLOW}Directory ${WORKSPACE_DIR} does not exist, skipping${NC}"
+fi
+
+# --- Kill all tmux windows with this name ---
+if tmux list-sessions > /dev/null 2>&1; then
+    killed=0
+    for target in $(tmux list-windows -a -F '#{session_name}:#{window_index}:#{window_name}' \
+        | grep ":${FEATURE_NAME}$"); do
+        session_and_window=$(echo "$target" | cut -d: -f1,2)
+        echo -e "${YELLOW}Killing tmux window ${session_and_window}...${NC}"
+        tmux kill-window -t "$session_and_window" 2>/dev/null || true
+        killed=$((killed + 1))
+    done
+    if [ "$killed" -eq 0 ]; then
+        echo -e "${YELLOW}No tmux windows named '${FEATURE_NAME}' found${NC}"
+    else
+        echo -e "${GREEN}Killed ${killed} tmux window(s)${NC}"
+    fi
+else
+    echo -e "${YELLOW}No tmux server running, skipping window cleanup${NC}"
+fi
+
+echo -e "${GREEN}Done! Workspace '${FEATURE_NAME}' cleaned up.${NC}"
