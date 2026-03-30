@@ -55,6 +55,16 @@ else
     exit 1
 fi
 
+# --- Detect AI agent command (claude preferred, agent as fallback) ---
+if command -v claude > /dev/null 2>&1; then
+    AGENT_CMD="claude"
+elif command -v agent > /dev/null 2>&1; then
+    AGENT_CMD="agent"
+else
+    AGENT_CMD=""
+    echo -e "${YELLOW}Warning: Neither 'claude' nor 'agent' command found — 2nd pane will be a plain shell${NC}"
+fi
+
 echo -e "${GREEN}Using base revision: ${BASE_REV}${NC}"
 
 # --- Create workspace ---
@@ -71,7 +81,10 @@ echo -e "${GREEN}Workspace created successfully${NC}"
 if [ -n "$TMUX" ]; then
     tmux new-window -n "$FEATURE_NAME" -c "$WORKSPACE_DIR"
     tmux split-window -h -c "$WORKSPACE_DIR"
-    tmux select-pane -t 1
+    if [ -n "$AGENT_CMD" ]; then
+        tmux send-keys "$AGENT_CMD" C-m
+    fi
+    tmux select-pane -L
 else
     SESSION=""
 
@@ -87,13 +100,19 @@ else
     if [ -n "$SESSION" ]; then
         tmux new-window -t "$SESSION" -n "$FEATURE_NAME" -c "$WORKSPACE_DIR"
         tmux split-window -h -t "$SESSION:$FEATURE_NAME" -c "$WORKSPACE_DIR"
-        tmux select-pane -t "$SESSION:$FEATURE_NAME.1"
+        if [ -n "$AGENT_CMD" ]; then
+            tmux send-keys -t "$SESSION:$FEATURE_NAME.1" "$AGENT_CMD" C-m
+        fi
+        tmux select-pane -t "$SESSION:$FEATURE_NAME.0"
         tmux attach-session -t "$SESSION"
     else
         SESSION=$(basename "$PWD")
         tmux new-session -d -s "$SESSION" -n "$FEATURE_NAME" -c "$WORKSPACE_DIR"
         tmux split-window -h -t "$SESSION:$FEATURE_NAME" -c "$WORKSPACE_DIR"
-        tmux select-pane -t "$SESSION:$FEATURE_NAME.1"
+        if [ -n "$AGENT_CMD" ]; then
+            tmux send-keys -t "$SESSION:$FEATURE_NAME.1" "$AGENT_CMD" C-m
+        fi
+        tmux select-pane -t "$SESSION:$FEATURE_NAME.0"
         tmux attach-session -t "$SESSION"
     fi
 fi
