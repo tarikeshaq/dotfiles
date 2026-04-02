@@ -1,7 +1,7 @@
 
 require('nvim-treesitter.configs').setup({
   -- List of parser names, or "all"
-  ensure_installed = { "lua", "rust", "go", "gomod", "gowork", "gosum" },
+  ensure_installed = { "lua", "rust", "go", "gomod", "gowork", "gosum", "python" },
 
   -- Install languages synchronously (only applied to `ensure_installed`)
   sync_install = false,

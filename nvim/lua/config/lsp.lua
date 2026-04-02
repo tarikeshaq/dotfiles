@@ -83,6 +83,9 @@ vim.lsp.enable('gopls')
 
 vim.lsp.enable('clangd')
 
+-- Python LSP (pyright)
+vim.lsp.enable('pyright')
+
 -- Keymaps for lsp
 local map = vim.keymap.set
 -- LSP mappings
