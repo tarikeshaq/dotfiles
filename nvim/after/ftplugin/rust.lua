@@ -18,3 +18,19 @@ vim.keymap.set(
     { silent = true, buffer = bufnr }
 )
 
+vim.keymap.set(
+    "n",
+    "<leader>kd",
+    function()
+        vim.cmd.RustLsp('openDocs')
+    end,
+    { silent = true, buffer = bufnr, desc = "Open docs.rs for symbol" }
+)
+
+vim.api.nvim_create_autocmd("BufWritePre", {
+    buffer = bufnr,
+    callback = function()
+        vim.lsp.buf.format({ async = false })
+    end,
+})
+
