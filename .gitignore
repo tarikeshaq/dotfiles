@@ -15,3 +15,6 @@ Thumbs.db
 
 # Backup files created by various tools
 *.backup.*
+
+# Claude Code sync cache of claude.ai skills (machine-generated, proprietary content)
+skills/synced/
