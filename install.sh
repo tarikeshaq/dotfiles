@@ -67,6 +67,8 @@ if [ "$1" = "--restore" ] || [ "$1" = "-r" ]; then
     restore_backup "$HOME/.config/nvim"
     restore_backup "$HOME/.config/jj"
     restore_backup "$HOME/.claude/skills"
+    restore_backup "$HOME/.claude/CLAUDE.md"
+    restore_backup "$HOME/.codex/AGENTS.md"
     restore_backup "$HOME/.cursor/skills"
 
     echo ""
@@ -271,6 +273,19 @@ if [ -d "$HOME/.cursor" ]; then
     create_symlink "$DOTFILES_DIR/skills" "$HOME/.cursor/skills"
 else
     echo -e "${YELLOW}Skipping Cursor skills (~/.cursor not found)${NC}"
+fi
+
+# Install global agent instructions (only if tool directories exist)
+if [ -d "$HOME/.claude" ]; then
+    create_symlink "$DOTFILES_DIR/agents/AGENTS.md" "$HOME/.claude/CLAUDE.md"
+else
+    echo -e "${YELLOW}Skipping Claude Code instructions (~/.claude not found)${NC}"
+fi
+
+if [ -d "$HOME/.codex" ]; then
+    create_symlink "$DOTFILES_DIR/agents/AGENTS.md" "$HOME/.codex/AGENTS.md"
+else
+    echo -e "${YELLOW}Skipping Codex instructions (~/.codex not found)${NC}"
 fi
 
 # Install scripts from bin/ to ~/bin/

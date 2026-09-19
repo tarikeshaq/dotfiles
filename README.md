@@ -12,6 +12,7 @@ This repository contains my configuration files for:
 - **Neovim** - Text editor setup with Lua-based config
 - **tmux** - Terminal multiplexer configuration
 - **LLM Skills** - Reusable [Agent Skills](https://agentskills.io) for Claude Code and Cursor
+- **Agent Instructions** - A global `AGENTS.md` (my working preferences + GCP/Terraform playbook) loaded by every Claude Code / Codex session
 
 ## Installation
 
@@ -86,6 +87,7 @@ dotfiles/
 ├── .tmux.conf          # tmux configuration
 ├── nvim/               # Neovim configuration directory
 ├── skills/             # LLM skills (Claude Code & Cursor)
+├── agents/AGENTS.md    # Global agent instructions (Claude Code & Codex)
 ├── install.sh          # Installation and restore script
 ├── CLAUDE.md           # Documentation for AI assistants
 └── README.md           # This file
@@ -113,6 +115,15 @@ skills/
 └── my-skill/
     └── SKILL.md
 ```
+
+## Global Agent Instructions
+
+`agents/AGENTS.md` holds instructions that apply to every project: how I like to work (red-green TDD, jj), Rust conventions, my default app stack, and the GCP + Terraform playbook for bootstrapping new projects. The install script symlinks it to:
+
+- `~/.claude/CLAUDE.md` — Claude Code's user-level memory, loaded into every session
+- `~/.codex/AGENTS.md` — Codex's global instructions
+
+Each link is only created if the tool's directory exists. Edit the file in this repo; every new session picks it up. Project-level `CLAUDE.md` / `AGENTS.md` files still take precedence for project specifics.
 
 ## Zsh Plugins Included
 

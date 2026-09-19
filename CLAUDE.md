@@ -14,6 +14,7 @@ dotfiles/
 ├── .tmux.conf          # tmux terminal multiplexer configuration
 ├── nvim/               # Complete Neovim configuration (git repo, .git excluded)
 ├── skills/             # Reusable LLM skills (shared by Claude Code and Cursor)
+├── agents/AGENTS.md    # Global agent instructions (Claude Code + Codex)
 ├── install.sh          # Installation and restoration script
 ├── CLAUDE.md           # This file - documentation for AI assistants
 └── README.md           # User-facing documentation
@@ -73,7 +74,15 @@ dotfiles/
 - **Structure**: Each skill is a subdirectory containing `SKILL.md`, with optional `references/`, `examples/`, and `scripts/` subdirectories
 - **Note**: Both tools share the same format, so a single `skills/` source directory serves both
 
-### 5. install.sh (Installation Script)
+### 5. agents/AGENTS.md (Global Agent Instructions)
+- **Symlinked to**:
+  - `~/.claude/CLAUDE.md` (if `~/.claude` exists — Claude Code user memory, loaded in every session)
+  - `~/.codex/AGENTS.md` (if `~/.codex` exists — Codex global instructions)
+- **Contents**: cross-project working preferences, default app stack, and the GCP/Terraform playbook generalized from `learnit` (`infra/`)
+- **Important**: Loaded into every session in every project — keep it concise and free of secrets or project-specific IDs
+- **Note**: Lives in `agents/`, not the repo root, so it isn't picked up as project instructions for this repo
+
+### 6. install.sh (Installation Script)
 - **Purpose**: Automates setup on new machines
 - **Executable**: Yes (chmod +x)
 
@@ -132,7 +141,7 @@ dotfiles/
 - Use timestamps for backup filenames
 - Keep multiple backups (don't auto-delete old ones)
 - Restore always uses most recent backup
-- Restore includes: `.gitconfig`, `.zshrc`, `.tmux.conf`, `nvim/`, `jj/`, and `skills/`
+- Restore includes: `.gitconfig`, `.zshrc`, `.tmux.conf`, `nvim/`, `jj/`, `skills/`, and the agent instruction links
 
 ### 6. Plugin Installation
 - `zsh-autosuggestions`: Installed via git clone to Oh My Zsh custom plugins directory
