@@ -19,6 +19,35 @@ These instructions come from my dotfiles (`~/code/dotfiles/agents/AGENTS.md`) an
 - **Keep it simple.** Fix the actual bug, don't restructure around it. In shell one-liners prefer plain pipes (`cmd | jq | xargs`) over intermediate variables and nested `$(...)`.
 - **Explain before mutating cloud state.** Before any `gcloud`/`bq`/`terraform`/`kubectl`/`docker push` command whose verb creates, updates, deletes, enables, deploys, or applies, state in a sentence what it does and its blast radius, then wait for my go-ahead. This holds even for "diagnostic" commands. Prefer read-only alternatives (`list`, `describe`, `plan`, `--dry-run`).
 
+## Architecture Decision Records
+
+Every project gets a `docs/adr/` directory. Create it (with `0000-template.md`) when scaffolding a new project, or the first time a decision comes up in an existing one.
+
+- **When to write one:** any decision a future reader would otherwise have to reverse-engineer or might "fix" by mistake. Examples: picking a library or framework over alternatives, a data model or wire format, an infra topology, a deliberate constraint ("runtime-checked queries, not compile-time"), or abandoning an earlier plan. When in doubt, write it; they're short.
+- **File name:** `docs/adr/NNNN-kebab-title.md`, numbered sequentially from `0001`; never reuse a number.
+- **Format** (short Nygard style):
+  ```markdown
+  # NNNN. Title
+
+  - Status: Proposed | Accepted | Superseded by [NNNN](NNNN-....md) | Deprecated
+  - Date: YYYY-MM-DD
+
+  ## Context
+  The forces at play: problem, constraints, what we knew at the time.
+
+  ## Decision
+  What we chose, stated actively ("We will ...").
+
+  ## Alternatives considered
+  Each option and why it lost.
+
+  ## Consequences
+  What gets easier, what gets harder, what we're now committed to.
+  ```
+- **ADRs are immutable once Accepted.** To change course, write a new ADR and mark the old one `Superseded by NNNN`; don't rewrite history. Fixing typos or adding links is fine.
+- **Same change as the code.** Land the ADR in the same PR/commit as the code it justifies. Put `Proposed` ADRs up for review before building on them.
+- **Keep the agent docs lean.** The repo's `AGENTS.md`/`CLAUDE.md` should link to relevant ADRs rather than hold decision logs inline. Before reversing an existing pattern, check `docs/adr/` for the reason it exists.
+
 ## Version control
 
 - Use **jj** when the repo has a `.jj/` directory (most of mine do, colocated with git); load the `jj` skill. Otherwise git.
