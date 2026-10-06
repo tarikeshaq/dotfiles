@@ -14,6 +14,7 @@ These instructions come from my dotfiles (`~/code/dotfiles/agents/AGENTS.md`) an
 - **Red-green, incremental.** Write the failing test first, make it pass, move on. Test small pieces before composing them. One feature at a time.
 - **Checkpoint often.** For multi-step features: one PR at the end with one commit per testable step, so I can check out any intermediate state. Every commit compiles and passes tests.
 - **Tests are necessary, not sufficient.** If a change touches a live system (API, cloud resource, deploy), also run the real smoke path before calling it done.
+- **Debug UI in a real browser.** For frontend bugs and UI changes, use the Claude in Chrome extension (`mcp__claude-in-chrome__*` tools) to load the page, take screenshots, and read the console and network requests, rather than guessing from source. Chrome runs on the Windows host and reaches WSL dev servers through `localhost` forwarding. I handle any sign-in myself.
 - **Record shortcuts.** When deferring something, note it in the repo's `TECH_DEBT.md` (or equivalent) in the same commit.
 - **Terse responses.** No long trailing summaries; I read the diff.
 - **Keep it simple.** Fix the actual bug, don't restructure around it. In shell one-liners prefer plain pipes (`cmd | jq | xargs`) over intermediate variables and nested `$(...)`.
