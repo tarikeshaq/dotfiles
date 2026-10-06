@@ -173,6 +173,7 @@ infra/
 | `monitoring` | Email channel, uptime checks, Cloud Run 5xx/latency, Cloud SQL, queue and log-based alerts |
 | `analytics` | Pub/Sub → BigQuery event pipeline, Cloud SQL federation, funnel views, deletion purge |
 | `grafana` | Grafana on Cloud Run + its Cloud SQL DB, keyless BigQuery access, Google login |
+| `docs-site` | oauth2-proxy on Cloud Run serving the mdBook build, Google login for allowlisted emails |
 
 ### Patterns I use
 
@@ -243,6 +244,22 @@ Reference implementation: `tarikeshaq/learnit`, in ADRs 0008 and 0009 and
 - **Account deletion:** a nightly BigQuery scheduled query purges a deleted
   user's events.
 - Not Looker Studio: it has no API or Terraform for building reports.
+
+### Project documentation
+
+Each app's **`docs/` directory is its canonical documentation**: an mdBook
+(with `mdbook-mermaid`), published privately at `docs.<domain>`. The
+reference is learnit's `docs/` and ADR 0010.
+
+- Navigation lives in `docs/SUMMARY.md`, with `create-missing = false` so a dangling entry fails the build. Existing topic docs and ADRs are pages in place.
+- `scripts/docs serve|build` downloads pinned binaries. CI builds the book on PRs.
+- Hosting: one image (the mdBook build stage plus `oauth2-proxy` with a `file://` upstream).
+  - The allowed-emails file is baked in.
+  - Runs on Cloud Run with 512Mi (the minimum for 1 CPU unthrottled), min 0, and a role-less SA.
+  - `/ping` is the probe.
+  - It needs its own OAuth client (redirect `https://docs.<domain>/oauth2/callback`).
+- `docs.yml` builds and deploys on merge. It skips while the service lacks the OAuth client id or secret.
+- **Update the page that describes a change in the same PR.** `CLAUDE.md`/`AGENTS.md` stay a short briefing that links into `docs/`.
 
 ### GCP gotchas I've already paid for
 
