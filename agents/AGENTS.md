@@ -169,7 +169,10 @@ infra/
 | `registry` | Artifact Registry Docker repo |
 | `secrets` | Secret Manager secret + version + accessor binding for one SA |
 | `dns` | Cloud DNS public zone, DNSSEC on |
-| `cloud-run-domain` | Cloud Run domain mapping + CNAME to `ghs.googlehosted.com.` |
+| `cloud-run-domain` | Cloud Run domain mapping + CNAME to `ghs.googlehosted.com.` (A/AAAA when `apex = true`) |
+| `monitoring` | Email channel, uptime checks, Cloud Run 5xx/latency, Cloud SQL, queue and log-based alerts |
+| `analytics` | Pub/Sub → BigQuery event pipeline, Cloud SQL federation, funnel views, deletion purge |
+| `grafana` | Grafana on Cloud Run + its Cloud SQL DB, keyless BigQuery access, Google login |
 
 ### Patterns I use
 
@@ -190,10 +193,72 @@ infra/
   - Frontend job: `npm ci && next build`.
 - `.github/workflows/deploy.yml`: on push to `main`, build → push to Artifact Registry with the `main-<sha7>` tag → `gcloud run deploy` → curl `/health`.
 
+### Observability and product analytics
+
+Reference implementation: `tarikeshaq/learnit`, in ADRs 0008 and 0009 and
+`docs/analytics.md`.
+
+- **Ops alerting first, from day one:** the `monitoring` module.
+  - Uptime checks on both the `run.app` and the custom-domain URLs: if only
+    the custom one fails, it's DNS or certs.
+  - Alerts on 5xx ratio, p95 latency, Cloud SQL CPU, disk and connections,
+    and queue depth.
+  - **Log-based alerts for failures the app swallows on purpose**, like
+    best-effort LLM calls.
+  - JSON logs (`severity`, `message`) so Error Reporting groups exceptions.
+- **Product analytics are first-party events, not a third-party script.**
+  - The backend calls `track(event, …)` behind a sink trait: Pub/Sub in
+    cloud, the Pub/Sub emulator in docker compose locally, a fake in tests.
+    It's fire-and-forget and never fails a request.
+  - The browser posts its few UI-only events to `POST /api/events`, never to
+    a vendor.
+  - **An event catalogue in the repo is the allowlist**: unknown events and
+    props are dropped in code. Only ids, enums and counts, never content.
+  - `user_id` comes from the server; signed-out visitors get a per-visit
+    `sessionStorage` id (`X-Anon-Id`). No cookies, so no consent banner. A
+    persistent cross-visit id would need consent.
+- **Storage:** Pub/Sub → a **BigQuery subscription** (no consumer code) →
+  `analytics.events`.
+  - Partitioned by day, clustered by event and user, 13-month expiry, plus a
+    dead-letter topic.
+  - Send `occurred_at` as RFC 3339 and `props` as a JSON string.
+- **App data joins through a BigQuery → Cloud SQL connection**, as a
+  read-only user that only sees an `analytics` schema of safe-column views.
+  The app migrates those views and grants the role at startup.
+- **Funnels and retention are SQL views in the repo**, Terraform-managed and
+  dry-run in CI or locally. A rerunnable `INSERT … SELECT FROM
+  EXTERNAL_QUERY` backfill with a cutoff covers history from before
+  instrumentation.
+- **Dashboards are Grafana as code:**
+  - Grafana on Cloud Run, min 0. Its state is a separate, connection-capped
+    DB on the app's Cloud SQL instance.
+  - A custom image with the BigQuery plugin baked in.
+  - The plugin uses `authenticationType = "gce"` as a dedicated SA with read
+    on the analytics dataset only. No keys.
+  - Google OAuth with sign-up off: only Terraform-provisioned users can log in.
+  - A separate `infra/grafana/` root (grafana provider) manages data sources,
+    users and dashboard JSON files, planned and applied in Terraform CI.
+  - Queries reference `analytics.v_*` without a project, so a dashboard
+    `datasource` variable can switch environments.
+- **Account deletion:** a nightly BigQuery scheduled query purges a deleted
+  user's events.
+- Not Looker Studio: it has no API or Terraform for building reports.
+
 ### GCP gotchas I've already paid for
 
 - **Cloud Run domain mappings** 403 ("Caller is not authorized to administer the domain") unless the Terraform SA is a verified **Owner** of the domain in Google Search Console. This is a manual step per domain.
 - **`--cpu-boost` is per-revision.** Every `gcloud run deploy` must pass it or the new revision silently drops it. The same applies to any revision-level flag Terraform set but CI redeploys over.
 - **Cloud Tasks calling back into the same Cloud Run service** needs three grants: `cloudtasks.enqueuer` on the runtime SA; `iam.serviceAccountTokenCreator` for the Cloud Tasks service agent *on* the runtime SA; and `iam.serviceAccountUser` for the runtime SA **on itself** (checked at enqueue time, otherwise `CreateTask` 403s).
+- **Google service agents are created lazily.** Granting a role to
+  `service-<n>@gcp-sa-{cloudscheduler,cloudtasks,pubsub,…}` on a fresh project
+  fails with "does not exist" until the API has provisioned it. Add
+  `google_project_service_identity` (google-beta) and `depends_on` it, or skip
+  the grant: Cloud Scheduler OIDC needs none on projects created after
+  2019-03.
+- **Grafana on Cloud SQL sockets:** Grafana runs `GF_DATABASE_HOST` through
+  `net.SplitHostPort`, so `/cloudsql/p:r:i` fails ("too many colons"). Use
+  `[/cloudsql/p:r:i]:5432`.
+- Once Terraform sets any field in a Cloud Run `resources` block it owns all
+  of them, so restate `startup_cpu_boost = true` or every apply turns it off.
 - The `*.run.app` URL isn't known until after creation. Use the custom domain for OIDC audiences and CORS to avoid chicken-and-egg problems.
 - Cost defaults for staging/research: Cloud SQL `db-f1-micro` (zonal), Cloud Run `min_instances = 0`. Call out anything that adds meaningful idle cost (GKE control plane, HA Cloud SQL, min instances > 0) before adding it.
